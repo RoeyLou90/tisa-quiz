@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "text": "如果你的投資在一個月內下跌了15%，你會？",
+    "options": [
+      { "id": 1, "text": "立刻賣出，避免更大損失", "scores": { "guardian": 3, "planner": 1 } },
+      { "id": 2, "text": "觀察一陣子再決定", "scores": { "planner": 3, "analyst": 2 } },
+      { "id": 3, "text": "繼續持有，相信長期會回升", "scores": { "adventurer": 2, "dreamer": 3 } },
+      { "id": 4, "text": "趁機加碼買進", "scores": { "adventurer": 3, "analyst": 1 } }
+    ]
+  },
+  {
+    "id": 2,
+    "text": "你認為理想的年報酬率應該是？",
+    "options": [
+      { "id": 1, "text": "2-4%，穩定就好", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "4-6%，略高於定存", "scores": { "planner": 3, "guardian": 1 } },
+      { "id": 3, "text": "6-10%，承受適度風險", "scores": { "analyst": 3, "dreamer": 2 } },
+      { "id": 4, "text": "10%以上，勇於冒險", "scores": { "adventurer": 3, "dreamer": 1 } }
+    ]
+  },
+  {
+    "id": 3,
+    "text": "面對投資波動，你的心情是？",
+    "options": [
+      { "id": 1, "text": "非常焦慮，影響日常生活", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "有點擔心，但能接受", "scores": { "planner": 3, "guardian": 1 } },
+      { "id": 3, "text": "覺得正常，市場本來就會波動", "scores": { "analyst": 3, "dreamer": 2 } },
+      { "id": 4, "text": "很興奮，波動代表機會", "scores": { "adventurer": 3 } }
+    ]
+  },
+  {
+    "id": 4,
+    "text": "你的投資時間規劃是？",
+    "options": [
+      { "id": 1, "text": "1年以內", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "1-3年", "scores": { "planner": 3 } },
+      { "id": 3, "text": "3-5年", "scores": { "analyst": 3 } },
+      { "id": 4, "text": "5年以上", "scores": { "adventurer": 3, "dreamer": 3 } }
+    ]
+  },
+  {
+    "id": 5,
+    "text": "你對投資產品的了解程度如何？",
+    "options": [
+      { "id": 1, "text": "不太了解，需要專業建議", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "了解基本概念", "scores": { "planner": 3 } },
+      { "id": 3, "text": "有投資經驗，能自行研究", "scores": { "analyst": 3 } },
+      { "id": 4, "text": "非常了解，經常研究市場", "scores": { "adventurer": 3, "dreamer": 3 } }
+    ]
+  },
+  {
+    "id": 6,
+    "text": "你的投資目標是？",
+    "options": [
+      { "id": 1, "text": "保本為主，穩定收益", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "穩定增值，略高於定存", "scores": { "planner": 3 } },
+      { "id": 3, "text": "追求穩健成長", "scores": { "analyst": 3 } },
+      { "id": 4, "text": "追求高報酬，願意承擔風險", "scores": { "adventurer": 3, "dreamer": 3 } }
+    ]
+  },
+  {
+    "id": 7,
+    "text": "你每月可用於投資的金額約為？",
+    "options": [
+      { "id": 1, "text": "5,000元以下", "scores": { "guardian": 3, "planner": 1 } },
+      { "id": 2, "text": "5,000-10,000元", "scores": { "planner": 3, "analyst": 2 } },
+      { "id": 3, "text": "10,000-30,000元", "scores": { "analyst": 3, "dreamer": 2 } },
+      { "id": 4, "text": "30,000元以上", "scores": { "adventurer": 3, "dreamer": 1 } }
+    ]
+  },
+  {
+    "id": 8,
+    "text": "你過去的投資經驗如何？",
+    "options": [
+      { "id": 1, "text": "沒有投資經驗", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "1年以下", "scores": { "planner": 3 } },
+      { "id": 3, "text": "1-3年", "scores": { "analyst": 3 } },
+      { "id": 4, "text": "3年以上", "scores": { "adventurer": 3, "dreamer": 3 } }
+    ]
+  },
+  {
+    "id": 9,
+    "text": "你對投資損失的承受度如何？",
+    "options": [
+      { "id": 1, "text": "無法承受任何損失", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "可承受5%以內的損失", "scores": { "planner": 3 } },
+      { "id": 3, "text": "可承受5-15%的損失", "scores": { "analyst": 3 } },
+      { "id": 4, "text": "可承受15%以上的損失", "scores": { "adventurer": 3, "dreamer": 3 } }
+    ]
+  },
+  {
+    "id": 10,
+    "text": "你通常如何做出投資決策？",
+    "options": [
+      { "id": 1, "text": "依賴理財專員建議", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "參考專家意見後決定", "scores": { "planner": 3 } },
+      { "id": 3, "text": "自行研究後決定", "scores": { "analyst": 3 } },
+      { "id": 4, "text": "憑直覺或市場熱度", "scores": { "adventurer": 3, "dreamer": 3 } }
+    ]
+  },
+  {
+    "id": 11,
+    "text": "對於新的理財工具或服務，你的態度是？",
+    "options": [
+      { "id": 1, "text": "觀望，等別人用過再說", "scores": { "guardian": 3, "planner": 2 } },
+      { "id": 2, "text": "了解清楚後才考慮", "scores": { "planner": 3, "analyst": 2 } },
+      { "id": 3, "text": "有興趣，會研究後嘗試", "scores": { "analyst": 3, "dreamer": 2 } },
+      { "id": 4, "text": "樂於嘗試新事物", "scores": { "adventurer": 3, "dreamer": 3 } }
+    ]
+  },
+  {
+    "id": 12,
+    "text": "你希望投資組合的波動程度如何？",
+    "options": [
+      { "id": 1, "text": "非常穩定，幾乎不波動", "scores": { "guardian": 3 } },
+      { "id": 2, "text": "輕微波動，可接受小幅波動", "scores": { "planner": 3 } },
+      { "id": 3, "text": "適度波動，追求合理報酬", "scores": { "analyst": 3 } },
+      { "id": 4, "text": "高波動，追求高報酬", "scores": { "adventurer": 3, "dreamer": 3 } }
+    ]
+  }
+]

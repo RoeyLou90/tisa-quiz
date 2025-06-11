@@ -88,7 +88,9 @@ export default {
         this.loading = true;
         console.log('Fetching questions from:', '/api/questions');
         
-        const response = await axios.get('http://localhost:5001/api/questions', {
+        // 使用環境變數中的 API 基礎 URL，如果未設置則使用相對路徑
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+        const response = await axios.get(`${apiBaseUrl}/questions`, {
           headers: {
             'Accept': 'application/json',
             'Cache-Control': 'no-cache'
