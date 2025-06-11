@@ -1,5 +1,5 @@
 // Import the questions data
-const questions = require('./questions.json');
+const questions = require('./data.json');
 
 // CORS headers
 const corsHeaders = {
