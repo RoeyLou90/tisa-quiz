@@ -1,0 +1,22 @@
+{
+  "name": "tisa-quiz-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "serve": "vite preview",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4",
+    "axios": "^1.4.0",
+    "chart.js": "^4.3.3",
+    "vue-chartjs": "^5.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.1",
+    "vite": "^4.4.9"
+  }
+}
