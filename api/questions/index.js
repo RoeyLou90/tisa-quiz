@@ -1,49 +1,31 @@
 // Import the questions data
 const questions = require('./data.json');
 
-// CORS headers
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
-
 // Main handler function
-export default async function handler(req, res) {
+module.exports = (req, res) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return res.status(200).end();
   }
 
   // Only allow GET requests
   if (req.method !== 'GET') {
-    return new Response('Method not allowed', { 
-      status: 405,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json'
-      }
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    // Set cache control headers
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+    
     // Return the questions as JSON
-    return new Response(JSON.stringify(questions), {
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json',
-        'Cache-Control': 's-maxage=3600, stale-while-revalidate'
-      }
-    });
+    return res.status(200).json(questions);
   } catch (error) {
     console.error('Error fetching questions:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-      status: 500,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json'
-      }
-    });
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
-}
+};

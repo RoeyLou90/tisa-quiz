@@ -86,20 +86,30 @@ export default {
     async fetchQuestions() {
       try {
         this.loading = true;
-        console.log('Fetching questions from:', '/api/questions');
+        this.error = null;
         
         // 使用環境變數中的 API 基礎 URL，如果未設置則使用相對路徑
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
-        const response = await axios.get(`${apiBaseUrl}/questions`, {
+        const apiUrl = `${apiBaseUrl}/questions`;
+        
+        console.log('Fetching questions from:', apiUrl);
+        
+        const response = await axios.get(apiUrl, {
           headers: {
             'Accept': 'application/json',
             'Cache-Control': 'no-cache'
-          }
+          },
+          // 添加超時設定
+          timeout: 10000,
+          // 添加請求參數避免緩存
+          params: { t: new Date().getTime() }
         });
 
         console.log('Received response:', {
           status: response.status,
-          data: response.data
+          statusText: response.statusText,
+          headers: response.headers,
+          data: response.data ? 'Data received' : 'No data'
         });
 
         if (!response.data || !Array.isArray(response.data)) {
@@ -111,15 +121,32 @@ export default {
         console.log(`Successfully loaded ${this.questions.length} questions`);
         
       } catch (error) {
-        console.error('Error in fetchQuestions:', {
+        const errorDetails = {
           message: error.message,
+          name: error.name,
+          stack: error.stack,
+          isAxiosError: error.isAxiosError,
           response: error.response ? {
             status: error.response.status,
+            statusText: error.response.statusText,
+            headers: error.response.headers,
             data: error.response.data
           } : 'No response',
-          error: error
-        });
-        alert('無法載入題目，請確認後端服務是否正常運行');
+          request: error.request ? 'Request was made but no response received' : 'No request was made',
+          config: error.config ? {
+            url: error.config.url,
+            method: error.config.method,
+            headers: error.config.headers
+          } : 'No config'
+        };
+        
+        console.error('Error in fetchQuestions:', errorDetails);
+        this.error = '無法載入題目，請稍後再試';
+        
+        // 如果是在開發環境，顯示更詳細的錯誤訊息
+        if (process.env.NODE_ENV === 'development') {
+          this.error += `\n${error.message}`;
+        }
       } finally {
         this.loading = false;
       }
