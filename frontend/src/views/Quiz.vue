@@ -1,184 +1,130 @@
 <template>
-  <div v-if="loading" class="loading-container">
-    <div class="loading-spinner"></div>
-    <p>載入題目中...</p>
+  <div v-if="error" class="error-container">
+    <div class="error-content">
+      <div class="error-icon">⚠️</div>
+      <h2>載入測驗時發生錯誤</h2>
+      <p class="error-message">{{ error }}</p>
+      <button @click="retryLoading" class="retry-button">重試</button>
+    </div>
   </div>
-  
+
+  <div v-else-if="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>載入題目中，請稍候...</p>
+  </div>
+
   <div v-else class="quiz-container">
-    <div class="progress-bar">
-      <div 
-        class="progress" 
-        :style="{ width: ((currentQuestionIndex + 1) / questions.length) * 100 + '%' }"
-      ></div>
-      <div class="progress-text">
-        問題 {{ currentQuestionIndex + 1 }} / {{ questions.length }}
-      </div>
+    <div v-if="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>載入題目中...</p>
     </div>
 
-    <transition name="fade" mode="out-in">
-      <div class="question-card" :key="currentQuestionIndex">
-        <h2>{{ currentQuestion.text }}</h2>
-        
-        <div class="options">
-          <button
-            v-for="(option, index) in currentQuestion.options"
-            :key="option.id"
-            @click="selectOption(index)"
-            :class="{ 'selected': selectedOptionIndex === index }"
-            class="option-button"
-          >
-            {{ option.text }}
-          </button>
-        </div>
-
-        <div class="navigation">
-          <button 
-            v-if="currentQuestionIndex > 0" 
-            @click="prevQuestion"
-            class="nav-button prev"
-          >
-            上一題
-          </button>
-          <button 
-            v-if="currentQuestionIndex < questions.length - 1" 
-            @click="nextQuestion"
-            :disabled="selectedOptionIndex === null"
-            class="nav-button next"
-            :class="{ 'disabled': selectedOptionIndex === null }"
-          >
-            下一題
-          </button>
-          <button 
-            v-else 
-            @click="submitQuiz"
-            :disabled="selectedOptionIndex === null"
-            class="nav-button submit"
-            :class="{ 'disabled': selectedOptionIndex === null }"
-          >
-            查看結果
-          </button>
+    <div v-else class="quiz-container">
+      <div class="progress-bar">
+        <div
+          class="progress"
+          :style="{
+            width: ((currentQuestionIndex + 1) / questions.length) * 100 + '%',
+          }"
+        ></div>
+        <div class="progress-text">
+          問題 {{ currentQuestionIndex + 1 }} / {{ questions.length }}
         </div>
       </div>
-    </transition>
+
+      <transition name="fade" mode="out-in">
+        <div class="question-card" :key="currentQuestionIndex">
+          <h2>{{ currentQuestion.text }}</h2>
+
+          <div class="options">
+            <button
+              v-for="(option, index) in currentQuestion.options"
+              :key="option.id"
+              @click="selectOption(index)"
+              :class="{ selected: selectedOptionIndex === index }"
+              class="option-button"
+            >
+              {{ option.text }}
+            </button>
+          </div>
+
+          <div class="navigation">
+            <button
+              v-if="currentQuestionIndex > 0"
+              @click="prevQuestion"
+              class="nav-button prev"
+            >
+              上一題
+            </button>
+            <button
+              v-if="currentQuestionIndex < questions.length - 1"
+              @click="nextQuestion"
+              :disabled="selectedOptionIndex === null"
+              class="nav-button next"
+              :class="{ disabled: selectedOptionIndex === null }"
+            >
+              下一題
+            </button>
+            <button
+              v-else
+              @click="submitQuiz"
+              :disabled="selectedOptionIndex === null"
+              class="nav-button submit"
+              :class="{ disabled: selectedOptionIndex === null }"
+            >
+              查看結果
+            </button>
+          </div>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 
-
 <script>
-import axios from 'axios';
+import axios from "axios";
+import {
+  PERSONALITY_TYPES,
+  calculatePersonality,
+} from "../utils/personalityData";
+
+// Create a custom axios instance with default configs
+const api = axios.create({
+  baseURL: process.env.VUE_APP_API_URL || "/api",
+  timeout: 10000, // 10 seconds
+  headers: {
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+    Expires: "0",
+  },
+});
 
 export default {
   data() {
     return {
-      loading: true,
+      loading: false,
       questions: [],
       currentQuestionIndex: 0,
       selectedOptionIndex: null,
       answers: [],
-    }
+      error: null,
+      retryCount: 0,
+      maxRetries: 3,
+    };
   },
   computed: {
     currentQuestion() {
       return this.questions[this.currentQuestionIndex] || {};
     },
-  },
-  methods: {
-    async fetchQuestions() {
-      try {
-        this.loading = true;
-        this.error = null;
-        
-        // 使用環境變數中的 API 基礎 URL，如果未設置則使用相對路徑
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
-        const apiUrl = `${apiBaseUrl}/questions`;
-        
-        console.log('Fetching questions from:', apiUrl);
-        
-        const response = await axios.get(apiUrl, {
-          headers: {
-            'Accept': 'application/json',
-            'Cache-Control': 'no-cache'
-          },
-          // 添加超時設定
-          timeout: 10000,
-          // 添加請求參數避免緩存
-          params: { t: new Date().getTime() }
-        });
-
-        console.log('Received response:', {
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers,
-          data: response.data ? 'Data received' : 'No data'
-        });
-
-        if (!response.data || !Array.isArray(response.data)) {
-          throw new Error('Invalid response format: expected an array');
-        }
-
-        this.questions = response.data;
-        this.answers = new Array(this.questions.length).fill(null);
-        console.log(`Successfully loaded ${this.questions.length} questions`);
-        
-      } catch (error) {
-        const errorDetails = {
-          message: error.message,
-          name: error.name,
-          stack: error.stack,
-          isAxiosError: error.isAxiosError,
-          response: error.response ? {
-            status: error.response.status,
-            statusText: error.response.statusText,
-            headers: error.response.headers,
-            data: error.response.data
-          } : 'No response',
-          request: error.request ? 'Request was made but no response received' : 'No request was made',
-          config: error.config ? {
-            url: error.config.url,
-            method: error.config.method,
-            headers: error.config.headers
-          } : 'No config'
-        };
-        
-        console.error('Error in fetchQuestions:', errorDetails);
-        this.error = '無法載入題目，請稍後再試';
-        
-        // 如果是在開發環境，顯示更詳細的錯誤訊息
-        if (process.env.NODE_ENV === 'development') {
-          this.error += `\n${error.message}`;
-        }
-      } finally {
-        this.loading = false;
-      }
-    },
-    selectOption(index) {
-      this.selectedOptionIndex = index;
-      this.answers[this.currentQuestionIndex] = index;
-    },
-    nextQuestion() {
-      if (this.selectedOptionIndex !== null) {
-        this.currentQuestionIndex++;
-        this.selectedOptionIndex = this.answers[this.currentQuestionIndex] !== null 
-          ? this.answers[this.currentQuestionIndex] 
-          : null;
-      }
-    },
-    prevQuestion() {
-      this.currentQuestionIndex--;
-      this.selectedOptionIndex = this.answers[this.currentQuestionIndex] !== null 
-        ? this.answers[this.currentQuestionIndex] 
-        : null;
-    },
-    calculateResult() {
+    scores() {
       const scores = {
-        guardian: 0,    // 守護者型 (G)
-        planner: 0,     // 計畫家型 (P)
-        analyst: 0,     // 分析師型 (R)
-        adventurer: 0,  // 冒險家型 (A)
-        dreamer: 0      // 夢想家型 (D)
+        guardian: 0,
+        planner: 0,
+        adventurer: 0,
+        analyst: 0,
+        dreamer: 0,
       };
 
-      // 計算每種人格的總分
       this.answers.forEach((answerIndex, questionIndex) => {
         if (answerIndex !== null && this.questions[questionIndex]) {
           const option = this.questions[questionIndex].options[answerIndex];
@@ -187,101 +133,202 @@ export default {
           });
         }
       });
-
-      // 將分數轉換為陣列並排序
-      const scoreEntries = Object.entries(scores);
-      // 按分數降序排序
-      scoreEntries.sort((a, b) => b[1] - a[1]);
-      
-      const [primaryType, primaryScore] = scoreEntries[0];
-      const [secondaryType, secondaryScore] = scoreEntries[1];
-      
-      let resultType = 'planner'; // 預設為計畫家型
-      
-      // 判斷結果類型
-      if (primaryScore >= 25 && (primaryScore - secondaryScore) >= 5) {
-        // 單一主導型：某一人格分數 ≥ 25分 且 超出第二高分5分以上
-        resultType = primaryType;
-      } else if (primaryScore < 15) {
-        // 保底機制：若所有分數都很低，預設為「計畫家型」
-        resultType = 'planner';
-      } else {
-        // 混合型：最高分與第二高分差距 < 5分
-        // 如果前兩名分數接近，視為混合型
-        if ((primaryScore - secondaryScore) < 5) {
-          // 這裡可以根據業務需求決定混合類型的處理方式
-          // 目前先返回分數較高的類型
-          resultType = primaryType;
-        } else {
-          resultType = primaryType;
-        }
+      return scores;
+    },
+    currentPersonality() {
+      return calculatePersonality(this.scores);
+    },
+  },
+  methods: {
+    async fetchQuestions() {
+      // Don't retry too many times
+      if (this.retryCount >= this.maxRetries) {
+        this.error = "無法載入題目，請稍後再試或聯繫管理員";
+        this.loading = false;
+        return;
       }
 
-      console.log('Scores:', scores);
-      console.log('Result type:', resultType);
+      this.loading = true;
+      this.error = null;
+      this.retryCount++;
 
-      return {
-        type: resultType,
-        scores: scores,
-        isMixed: (primaryScore - secondaryScore) < 5 && primaryScore >= 25
+      try {
+        const response = await api.get("/api/questions", {
+          params: {
+            _t: Date.now(), // Prevent caching
+          },
+          timeout: 8000, // 8 seconds timeout
+        });
+
+        // Validate response structure
+        if (!response.data || !Array.isArray(response.data)) {
+          throw new Error("無效的題目格式");
+        }
+
+        this.questions = response.data;
+        this.answers = new Array(response.data.length).fill(null);
+        this.retryCount = 0; // Reset retry counter on success
+        console.log(`成功載入 ${this.questions.length} 道題目`);
+      } catch (error) {
+        console.error("載入題目時發生錯誤:", error);
+
+        // Handle different error types
+        if (
+          error.code === "ECONNABORTED" ||
+          error.message.includes("timeout")
+        ) {
+          this.error = "請求超時，請檢查您的網路連線";
+        } else if (error.response) {
+          // Server responded with error status
+          this.handleServerError(error.response.status);
+        } else if (error.request) {
+          // No response received
+          this.error = "無法連接到伺服器，請檢查您的網路連線";
+        } else {
+          // Other errors
+          this.error = error.message || "載入題目時發生未知錯誤";
+        }
+
+        // Show retry button if we haven't exceeded max retries
+        if (this.retryCount < this.maxRetries) {
+          this.error += "，正在嘗試重新載入...";
+          // Auto-retry after a delay
+          setTimeout(() => this.fetchQuestions(), 2000);
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    handleServerError(status) {
+      const errorMessages = {
+        400: "請求參數錯誤",
+        401: "未經授權",
+        403: "權限不足",
+        404: "找不到題目資料",
+        429: "請求過於頻繁，請稍後再試",
+        500: "伺服器內部錯誤",
+        503: "服務暫時不可用",
       };
+
+      this.error = errorMessages[status] || `伺服器錯誤 (${status})`;
+    },
+
+    retryLoading() {
+      this.retryCount = 0;
+      this.fetchQuestions();
+    },
+
+    selectOption(index) {
+      this.selectedOptionIndex = index;
+    },
+    nextQuestion() {
+      if (this.selectedOptionIndex === null) return;
+
+      this.answers.push(this.selectedOptionIndex);
+      this.currentQuestionIndex++;
+      this.selectedOptionIndex = null;
+    },
+    prevQuestion() {
+      if (this.currentQuestionIndex === 0) return;
+
+      this.currentQuestionIndex--;
+      this.selectedOptionIndex = this.answers[this.currentQuestionIndex];
     },
     submitQuiz() {
       if (this.selectedOptionIndex === null) return;
-      
-      const result = this.calculateResult();
+
+      this.answers.push(this.selectedOptionIndex);
+
+      // Calculate final personality
+      const personality = this.currentPersonality;
+
       this.$router.push({
-        path: '/result',
-        query: { 
-          type: result.type,
-          isMixed: result.isMixed ? '1' : '0',
-          scores: JSON.stringify(result.scores)
-        }
+        path: "/result",
+        query: {
+          personality: JSON.stringify(personality),
+        },
       });
-    }
+    },
   },
   mounted() {
     this.fetchQuestions();
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.error-content {
+  text-align: center;
+  max-width: 500px;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  color: #dc3545;
+  margin: 1rem 0;
+  line-height: 1.5;
+}
+
+.retry-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #0056b3;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 60vh;
-  color: #4b5563;
+  min-height: 100vh;
 }
 
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #e5e7eb;
-  border-top-color: #3b82f6;
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
+  border-left-color: #09f;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
-
-<style scoped>
 .quiz-container {
   max-width: 800px;
   margin: 0 auto;
@@ -401,11 +448,11 @@ export default {
   .question-card {
     padding: 1.5rem 1rem;
   }
-  
+
   .question-card h2 {
     font-size: 1.25rem;
   }
-  
+
   .option-button {
     padding: 0.75rem 1rem;
   }
