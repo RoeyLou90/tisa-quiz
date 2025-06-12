@@ -142,7 +142,7 @@ export default {
           ]
         },
         analyst: {
-          name: '分析師型 (研究型)',
+          name: '理性分析師型 (研究型)',
           emoji: '🔍',
           description: '你擅長分析研究，重視數據與邏輯，適合基於深入研究的投資策略。你願意花時間研究，並根據分析結果做出投資決策。',
           recommendations: [
@@ -208,9 +208,9 @@ export default {
           ]
         },
         dreamer: {
-          name: '夢想家型 (成長型)',
+          name: '靈活夢想家型 (成長型)',
           emoji: '✨',
-          description: '你著眼未來，願意承擔風險追求高成長，適合積極成長的投資策略。你對新事物持開放態度，願意投資於創新和未來趨勢。',
+          description: '你具有遠見，願意承擔較高風險以追求長期資本增值。你相信創新和成長型投資的潛力，並願意長期持有。你對新事物持開放態度，願意投資於創新和未來趨勢。',
           recommendations: [
             '重點配置高成長潛力的創新產業',
             '長期投資，享受複利效果',
@@ -272,9 +272,9 @@ export default {
       const names = {
         guardian: '守護者型',
         planner: '計畫家型',
-        analyst: '分析師型',
+        analyst: '理性分析師型',
         adventurer: '冒險家型',
-        dreamer: '夢想家型'
+        dreamer: '靈活夢想家型'
       };
       return names[type] || '計畫家型';
     },
